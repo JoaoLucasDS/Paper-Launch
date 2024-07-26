@@ -11,32 +11,29 @@ const ThemeSwitcher = () => {
 export const ThemeSwitch = ({
 }) => {
   const { setTheme, theme } = useTheme();
-  const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
+  const [isDarkMode, setIsDarkMode] = useState(theme === 'light');
 
   const handleChange = () => {
     const newTheme = isDarkMode ? 'light' : 'dark';
     setTheme(newTheme);
     setIsDarkMode(!isDarkMode);
+    setEnabled(!enabled)
   };
 
+  const [enabled, setEnabled] = useState(theme === 'light' ? false : true);
+
   return (
-    <Switch
-      classNames={{
-        base: cn(
-          "justify-between cursor-pointer rounded-lg  border-2 border-transparent w-12",
-          "border-primary",
-        ),
-        wrapper: "p-0 h-4  overflow-visible bg-blue ",
-        thumb: cn("w-10 h-10 border-2 shadow-lg",
-          "group-data-[hover=true]:border-primary",
-          //selected
-          "group-data-[selected=true]:ml-6",
-          // pressed
-          "group-data-[pressed=true]:w-7",
-          "group-data-[selected]:group-data-[pressed]:ml-8",
-        ),
-      }}
+    <div
+      className={`w-16 h-6 flex items-center cursor-pointer border-3 ${
+        enabled ? 'bg-white border-black' : 'bg-black border-white'
+      }`}
+      onClick={handleChange}
     >
-    </Switch>
+      <div
+        className={`w-8 h-5 ${enabled ? 'bg-black' : 'bg-white'} border-black transform transition-transform duration-300 ease-in-out ${
+          enabled ? 'translate-x-7' : 'translate-x-0'
+        }`}
+      />
+    </div>
   );
 };

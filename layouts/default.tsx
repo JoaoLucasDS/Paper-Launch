@@ -16,7 +16,7 @@ export default function DefaultLayout({
       <main className="container mx-auto max-w-7xl px-6 flex-grow pt-16">
         {children}
       </main>
-      <footer className="w-full flex items-center justify-center py-3">
+      <footer className="w-full flex items-center justify-center py-3 font-bold">
         <Link
           isExternal
           className="flex items-center gap-1 text-current"
@@ -24,7 +24,7 @@ export default function DefaultLayout({
           title="nextui.org homepage"
         >
           <span className="text-default-600">Powered by</span>
-          <p className="text-primary">NextUI</p>
+          <p className="text-default font-black">NextUI</p>
         </Link>
       </footer>
     </div>

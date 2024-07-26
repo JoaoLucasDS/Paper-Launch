@@ -21,7 +21,7 @@ export default function IndexPage() {
             <Button className="text-secondary text-4xl font-bold px-6 py-2" color="primary" size="lg">
               START
             </Button>
-            <Button className="text-4xl font-bold px-6 py-2" color="primary" variant="bordered" size="lg" >
+            <Button className="text-4xl font-bold px-6 py-2 border-3" color="primary" variant="bordered" size="lg" >
               ABOUT
             </Button>
           </div>
