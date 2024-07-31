@@ -1,27 +1,32 @@
 import DefaultLayout from "@/layouts/default";
 
 import {Button} from "@nextui-org/button";
-import {Image} from "@nextui-org/image";
 import Logo from '@/components/logo';
 
-import { useTheme } from "next-themes";
+import { useRouter } from 'next/router';
 
 export default function IndexPage() {
-  const { theme } = useTheme();
+  const router = useRouter();
+
+  const handleStart = () => {
+    router.push('/chat'); // Change '/another-page' to your target route
+  };
+
+
+
   return (
     <DefaultLayout>
-      <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
+      <section className="flex flex-col items-center justify-center gap-4 ">
         <div className="inline-block max-w-lg text-center justify-center">
-          {/* <Image src={`/paper_launch_logo.svg`} width="300" radius="none"/> */}
-          <div className="mb-10">
+          <div className="mt-0 mb-10">
             <Logo/>
           </div>
           
-          <div className="inline-flex flex-col gap-y-4">
-            <Button className="text-secondary text-4xl font-bold px-6 py-2" color="primary" size="lg">
+          <div className="inline-flex flex-col gap-y-5">
+            <Button className="button-primary" onClick={handleStart} size="lg">
               START
             </Button>
-            <Button className="text-4xl font-bold px-6 py-2" color="primary" variant="bordered" size="lg" >
+            <Button className="button-secondary" size="lg" >
               ABOUT
             </Button>
           </div>

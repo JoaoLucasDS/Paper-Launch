@@ -1,3 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.page-enter {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.page-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms, transform 300ms;
+}
+
+.page-exit {
+    opacity: 1;
+    transform: translateY(0);
+}
+  
+.page-exit-active {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 300ms, transform 300ms;
+}
+
+.button-primary {
+    @apply text-secondary text-3xl border-3 border-primary bg-primary font-bold px-10 py-6;
+}
+
+.button-secondary {
+    @apply text-3xl font-bold px-6 py-6 border-3 border-primary bg-secondary text-primary hover:text-secondary hover:bg-primary
+}
+
+.input-primary {
+    @apply bg-secondary border-3 py-1  border-primary font-bold 
+}

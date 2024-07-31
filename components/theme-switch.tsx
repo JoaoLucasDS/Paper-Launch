@@ -20,23 +20,17 @@ export const ThemeSwitch = ({
   };
 
   return (
-    <Switch
-      classNames={{
-        base: cn(
-          "justify-between cursor-pointer rounded-lg  border-2 border-transparent w-12",
-          "border-primary",
-        ),
-        wrapper: "p-0 h-4  overflow-visible bg-blue ",
-        thumb: cn("w-10 h-10 border-2 shadow-lg",
-          "group-data-[hover=true]:border-primary",
-          //selected
-          "group-data-[selected=true]:ml-6",
-          // pressed
-          "group-data-[pressed=true]:w-7",
-          "group-data-[selected]:group-data-[pressed]:ml-8",
-        ),
-      }}
+    <div
+      className={`w-16 h-7 flex items-center cursor-pointer border-3 ${
+        isDarkMode ? 'bg-black border-white' : 'bg-white border-black'
+      }`}
+      onClick={handleChange}
     >
-    </Switch>
+      <div
+        className={`w-8 h-6 ${isDarkMode ? 'bg-white' : 'bg-black'} border-black transform transition-transform duration-300 ease-in-out ${
+          isDarkMode ? 'translate-x-0' : 'translate-x-7'
+        }`}
+      />
+    </div>
   );
 };
