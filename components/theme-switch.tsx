@@ -11,13 +11,16 @@ const ThemeSwitcher = () => {
 export const ThemeSwitch = ({
 }) => {
   const { setTheme, theme } = useTheme();
-  const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
+  const [isDarkMode, setIsDarkMode] = useState(theme === 'light');
 
   const handleChange = () => {
     const newTheme = isDarkMode ? 'light' : 'dark';
     setTheme(newTheme);
     setIsDarkMode(!isDarkMode);
+    setEnabled(!enabled)
   };
+
+  const [enabled, setEnabled] = useState(theme === 'light' ? false : true);
 
   return (
     <div
