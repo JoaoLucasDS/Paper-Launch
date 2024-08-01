@@ -1,4 +1,4 @@
-import DefaultLayout from "@/layouts/default";
+import HomeLayout from "@/layouts/home";
 
 import {Button} from "@nextui-org/button";
 import Logo from '@/components/logo';
@@ -15,7 +15,7 @@ export default function IndexPage() {
 
 
   return (
-    <DefaultLayout>
+    <HomeLayout>
       <section className="flex flex-col items-center justify-center gap-4 ">
         <div className="inline-block max-w-lg text-center justify-center">
           <div className="mt-0 mb-10">
@@ -34,6 +34,6 @@ export default function IndexPage() {
         </div>
       </section>
 
-    </DefaultLayout>
+    </HomeLayout>
   );
 }

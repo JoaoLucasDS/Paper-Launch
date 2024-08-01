@@ -9,7 +9,12 @@ module.exports = {
     './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['Poppins', 'Helvetica', 'Arial', 'sans-serif'], // For Google Fonts
+        // sans: ['MyCustomFont', 'Helvetica', 'Arial', 'sans-serif'], // For local font
+      },
+    },
   },
   darkMode: "class",
   plugins: [nextui({
@@ -20,10 +25,6 @@ module.exports = {
           secondary: '#ffffff',
           default: '#f58634',
           background: '#ffffff',
-          text: {
-            DEFAULT: '#000000',
-            variation: '#ffffff'
-          },
           
         },
         layout: {
@@ -37,10 +38,6 @@ module.exports = {
           secondary: '#000000',
           default: '#f58634',
           background: '#000000',
-          text: {
-            DEFAULT: '#ffffff',
-            variation: '#000000'
-          },
           
         },
         layout: {

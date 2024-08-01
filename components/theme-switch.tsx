@@ -1,5 +1,5 @@
 // components/ThemeSwitcher.js
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Switch, cn } from "@nextui-org/react";
 import { useTheme } from 'next-themes';
 
@@ -12,6 +12,12 @@ export const ThemeSwitch = ({
 }) => {
   const { setTheme, theme } = useTheme();
   const [isDarkMode, setIsDarkMode] = useState(theme === 'light');
+
+    // Initialize the state based on the theme
+    useEffect(() => {
+      setIsDarkMode(theme === 'dark');
+    }, [theme]);
+  
 
   const handleChange = () => {
     const newTheme = isDarkMode ? 'light' : 'dark';

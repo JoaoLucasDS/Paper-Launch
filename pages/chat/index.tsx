@@ -5,12 +5,13 @@ import {Input, Button} from "@nextui-org/react";
 import { title } from "@/components/primitives";
 import DefaultLayout from "@/layouts/default";
 
-import Peer from 'peerjs';
+import Peer, { DataConnection } from 'peerjs';
 
 export default function ChatPage() {
   const [isConnected, setConnected] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const peer = new Peer();
+  let conn: DataConnection;
 
   const [messages, setMessages] = useState<string[]>([]);
 
@@ -19,11 +20,18 @@ export default function ChatPage() {
     console.log('sendText')
   };
   const handleConnection = () => {
-    var conn = peer.connect(inputValue);
-    conn.on('open', function(){
-      // here you have conn.id
-      conn.send('hi!');
-    });
+    try {
+      conn = peer.connect(inputValue);
+      conn.on('open', function(){
+        // here you have conn.id
+        conn.send('hi!');
+      });
+      setInputValue('')
+      setConnected(true)
+    }
+    catch(e){
+      console.log(e)
+    }
     setInputValue('')
   };
 
@@ -45,6 +53,7 @@ export default function ChatPage() {
     });
 
     return () => {
+      console.log('closed')
       peer.destroy();
     };
   }, []);

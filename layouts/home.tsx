@@ -1,9 +1,17 @@
 import { Link } from "@nextui-org/link";
 import { Head } from "./head";
-import { Navbar } from "@/components/navbar";
 
 import { useRouter } from "next/router";
 import { AnimatePresence, motion } from 'framer-motion';
+
+import {
+  Navbar as NextUINavbar,
+  NavbarContent,
+  NavbarItem,
+} from "@nextui-org/navbar";
+
+import { ThemeSwitch } from "@/components/theme-switch";
+import Logo from '@/components/logo-b';
 
 export default function DefaultLayout({
   children,
@@ -14,7 +22,19 @@ export default function DefaultLayout({
   return (
     <div className="relative flex flex-col h-screen">
       <Head />
-      <Navbar />
+      <NextUINavbar maxWidth="xl" position="sticky">
+
+
+        <NavbarContent
+          className="hidden sm:flex basis-1/5 sm:basis-full"
+          justify="end"
+        >
+          <NavbarItem className="hidden sm:flex gap-2">
+            <ThemeSwitch />
+          </NavbarItem>
+        </NavbarContent>
+
+      </NextUINavbar>
       <main className="container mx-auto max-w-7xl px-6 flex-grow pt-16">
         <AnimatePresence mode='wait'>
           <motion.div
