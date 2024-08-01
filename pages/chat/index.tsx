@@ -1,52 +1,65 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Input, Button } from "@nextui-org/react";
 import { title } from "@/components/primitives";
 import DefaultLayout from "@/layouts/default";
 import Peer, { DataConnection } from 'peerjs';
+import Messages from '@/components/messages'; 
+
+type Message = {
+  from: string;
+  message: string;
+};
 
 export default function ChatPage() {
   const [isConnected, setConnected] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [peerId, setPeerId] = useState("");
   const [conn, setConn] = useState<DataConnection | null>(null);
-  const [peerInstance, setPeerInstance] = useState<Peer | null>(null);
+  const peerInstance = useRef<Peer | null>(null);
 
   useEffect(() => {
-    const peer = new Peer(); // Initialize PeerJS
-    setPeerInstance(peer);
+    if (!peerInstance.current) {
+      const peer = new Peer();
+      peerInstance.current = peer;
 
-    peer.on('open', (id) => {
-      setPeerId(id);
-      console.log('My peer ID is: ' + id);
-    });
-
-    peer.on('connection', (incomingConn) => {
-      console.log('Incoming connection from:', incomingConn.peer);
-      setConn(incomingConn);
-      incomingConn.on('data', (data) => {
-        console.log('Received data:', data);
-        const message = data as string;
-        setMessages((prevMessages) => [...prevMessages, `From ${incomingConn.peer}: ${message}`]);
-        // Respond back to the sender
-        incomingConn.send(`Received your message: "${message}"`);
+      peer.on('open', (id) => {
+        setPeerId(id);
+        console.log('My peer ID is: ' + id);
       });
-      setConnected(true);
-    });
+
+      peer.on('connection', (incomingConn) => {
+        console.log('Incoming connection from:', incomingConn.peer);
+        setConn(incomingConn);
+        incomingConn.on('data', (data) => {
+          console.log('Received data:', data);
+          const message = data as string;
+          const obj = {
+            from: incomingConn.peer,
+            message: message
+          };
+          setMessages((prevMessages) => [...prevMessages, obj]);
+
+          incomingConn.send(`Received your message: "${message}"`);
+        });
+        setConnected(true);
+      });
+    }
 
     return () => {
-      if (peer) {
-        peer.disconnect();
+      if (peerInstance.current) {
+        peerInstance.current.disconnect();
         console.log('Peer disconnected');
+        peerInstance.current = null;
       }
     };
   }, []);
 
   const handleConnection = () => {
-    if (!peerInstance || !inputValue) return;
+    if (!peerInstance.current || !inputValue) return;
 
     try {
-      const newConn = peerInstance.connect(inputValue);
+      const newConn = peerInstance.current.connect(inputValue);
       newConn.on('open', () => {
         console.log('Connection established with:', inputValue);
         newConn.send('hi!');
@@ -57,7 +70,11 @@ export default function ChatPage() {
       newConn.on('data', (data) => {
         console.log('Received data from peer:', data);
         const message = data as string;
-        setMessages((prevMessages) => [...prevMessages, `From ${inputValue}: ${message}`]);
+        const obj = {
+          from: inputValue,
+          message: message
+        };
+        setMessages((prevMessages) => [...prevMessages, obj]);
       });
       newConn.on('error', (err) => {
         console.error('Connection error:', err);
@@ -70,9 +87,13 @@ export default function ChatPage() {
 
   const sendText = () => {
     if (conn && inputValue) {
+      const obj = {
+        from: peerId,
+        message: inputValue
+      };
       conn.send(inputValue);
-      setMessages((prevMessages) => [...prevMessages, `To peer: ${inputValue}`]);
-      setInputValue(''); // Clear the input field after sending
+      setMessages((prevMessages) => [...prevMessages, obj]);
+      setInputValue(''); 
     } else {
       console.error('No active connection or no input value to send');
     }
@@ -109,9 +130,7 @@ export default function ChatPage() {
           </Button>
         </div>
         <div className="flex w-full justify-center items-end gap-4">
-          <h1 className={title()}>
-            {messages.join(', ')}
-          </h1>
+          <Messages messages={messages} peerId={peerId} />
         </div>
       </section>
     </DefaultLayout>
