@@ -7,6 +7,7 @@ import Messages from '@/components/messages';
 
 type Message = {
   from: string;
+  received: boolean
   message: string;
 };
 
@@ -31,16 +32,14 @@ export default function ChatPage() {
       peer.on('connection', (incomingConn) => {
         console.log('Incoming connection from:', incomingConn.peer);
         setConn(incomingConn);
+        //respond
         incomingConn.on('data', (data) => {
           console.log('Received data:', data);
-          const message = data as string;
-          const obj = {
-            from: incomingConn.peer,
-            message: message
-          };
-          setMessages((prevMessages) => [...prevMessages, obj]);
+          const message = data as Message;
 
-          incomingConn.send(`Received your message: "${message}"`);
+          setMessages((prevMessages) => [...prevMessages, message]);
+
+          //incomingConn.send(obj);
         });
         setConnected(true);
       });
@@ -62,19 +61,14 @@ export default function ChatPage() {
       const newConn = peerInstance.current.connect(inputValue);
       newConn.on('open', () => {
         console.log('Connection established with:', inputValue);
-        newConn.send('hi!');
-        console.log('Sent: hi!');
         setConn(newConn);
         setConnected(true);
       });
-      newConn.on('data', (data) => {
-        console.log('Received data from peer:', data);
-        const message = data as string;
-        const obj = {
-          from: inputValue,
-          message: message
-        };
-        setMessages((prevMessages) => [...prevMessages, obj]);
+      newConn.on('data', (data: unknown) => {
+        const message = data as Message; // Cast data to Message
+        console.log('Received data from peer:', message);
+
+        setMessages((prevMessages) => [...prevMessages, message]);
       });
       newConn.on('error', (err) => {
         console.error('Connection error:', err);
@@ -89,13 +83,25 @@ export default function ChatPage() {
     if (conn && inputValue) {
       const obj = {
         from: peerId,
+        received: true,
         message: inputValue
       };
-      conn.send(inputValue);
+      conn.send(obj);
+      obj.received = false
+      console.log('Store:', obj);
       setMessages((prevMessages) => [...prevMessages, obj]);
       setInputValue(''); 
     } else {
       console.error('No active connection or no input value to send');
+    }
+  };
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (isConnected) {
+      sendText();
+    } else {
+      handleConnection();
     }
   };
 
@@ -112,7 +118,7 @@ export default function ChatPage() {
             {peerId}
           </span>
         </div>
-        <div className="flex w-full justify-center items-end gap-4">
+        <form onSubmit={handleSubmit} className="flex w-full justify-center items-end gap-4">
           <Input
             className="input-primary"
             label="Message"
@@ -128,9 +134,9 @@ export default function ChatPage() {
           >
             {isConnected ? 'SEND' : 'CONNECT'}
           </Button>
-        </div>
+        </form>
         <div className="flex w-full justify-center items-end gap-4">
-          <Messages messages={messages} peerId={peerId} />
+          <Messages messages={messages} />
         </div>
       </section>
     </DefaultLayout>
