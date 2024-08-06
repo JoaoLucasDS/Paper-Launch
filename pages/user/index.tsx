@@ -4,9 +4,14 @@ import { nanoid, customAlphabet  } from 'nanoid'
 import { useState, useEffect, useRef } from 'react';
 import { title } from "@/components/primitives";
 
+import { useRecoilState } from 'recoil';
+import { userAtom, User } from '@/state/atoms/userAtom'
+
 export default function IndexPage() {
     const [id, setID] = useState<string>();
     const [inputValue, setInputValue] = useState("");
+
+    const [user, setUser] = useRecoilState(userAtom);
 
     useEffect(() => {
         console.log('on')
@@ -22,10 +27,19 @@ export default function IndexPage() {
         };
     }, []);
 
+    const handleContinue = () => {
+      console.log(inputValue)
+      setUser((prevUser) => ({
+        ...prevUser || { name: '', id: '', email: '' },
+        name: inputValue,
+      }));
+      console.log(user)
+    };
+    
+
     const handleSubmit = (event: React.FormEvent) => {
-        event.preventDefault();
-        console.log('aaaata')
-      };
+      event.preventDefault();
+    };
     
 
     return (
@@ -51,15 +65,24 @@ export default function IndexPage() {
             labelPlacement="outside"
             placeholder="Enter your name"
             value={inputValue}
-            onValueChange={(value) => setInputValue(value.toUpperCase())}
+            onValueChange={(value) => setInputValue(value.toUpperCase().replace(' ', '_'))}
           />
           <Button
             className="button-primary"
             size="lg"
+            onClick={handleContinue}
           >
             CONTINUE
           </Button>
         </form>
+        <div className="inline-block max-w-lg text-center justify-center">
+            <span className="text-3xl font-bold">
+                {`TESTE BRABO`}
+            </span>
+            <span className="text-3xl font-bold text-default">
+                {` ${user?.name}`}
+            </span>
+        </div>
       </section>
         </DefaultLayout>
     );
