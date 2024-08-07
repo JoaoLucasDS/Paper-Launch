@@ -1,55 +1,68 @@
 import DefaultLayout from "@/layouts/default";
-import { Button, Input } from "@nextui-org/react";
+import { Button, Input } from "@nextui-org/react"
 import { nanoid, customAlphabet  } from 'nanoid'
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react'
 import { title } from "@/components/primitives";
 
 import { useRecoilState } from 'recoil';
 import { userAtom, User } from '@/state/atoms/userAtom'
 
+import { useRouter } from 'next/router';
+
 export default function IndexPage() {
-    const [id, setID] = useState<string>();
-    const [inputValue, setInputValue] = useState("");
+  const [id, setID] = useState<string>();
+  const [inputValue, setInputValue] = useState("");
 
-    const [user, setUser] = useRecoilState(userAtom);
+  const [user, setUser] = useRecoilState(userAtom);
 
-    useEffect(() => {
-        console.log('on')
-        const generateNanoId  = (lenght: number | undefined) => {
-            const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+[]{}|;:,.<>?', lenght)
-            return nanoid();
-        }
-        setID(generateNanoId(5))
+  const router = useRouter();
 
-        return () => {
-            console.log('off')
+  useEffect(() => {
+    console.log('on')
+    const generateNanoId  = (lenght: number | undefined) => {
+      const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', lenght)
+      return nanoid();
+    }
+    setID(generateNanoId(5))
 
-        };
-    }, []);
-
-    const handleContinue = () => {
-      console.log(inputValue)
-      setUser((prevUser) => ({
-        ...prevUser || { name: '', id: '', email: '' },
-        name: inputValue,
-      }));
-      console.log(user)
+    return () => {
+      console.log('off')
     };
-    
+  }, []);
 
-    const handleSubmit = (event: React.FormEvent) => {
-      event.preventDefault();
-    };
-    
+  const handleName = () => {
+    if (inputValue.length > 0) {
+      try {
+        setUser((prevUser) => ({
+          ...prevUser || { name: '', id: '', email: '' },
+          name: inputValue,
+          id: id as string
+        }));
+        
+      } catch (e) {
+        console.error('Connection failed:', e);
+      }
+    }
+  };
 
-    return (
-        <DefaultLayout>
-        <section className="flex flex-col items-center justify-center gap-4 ">
-            <div className="inline-block max-w-lg text-center justify-center">
-                Your name will be:
-            </div>
-        </section>
-        <section className="w-full max-w-2xl mx-auto flex flex-col items-center justify-center gap-4">
+  const handleContinue = () => {
+    router.push('/chat'); 
+  };
+  
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+  };
+  
+
+  return (
+    <DefaultLayout>
+      <section className="flex flex-col items-center justify-center gap-4 ">
+        <div className="inline-block max-w-lg text-center justify-center">
+          Your name will be:
+        </div>
+      </section>
+      <section className="w-full max-w-2xl mx-auto flex flex-col items-center justify-center gap-4">
         <div className="inline-block max-w-lg text-center justify-center">
             <span className="text-3xl font-bold">
                 {`${inputValue}`}
@@ -70,20 +83,16 @@ export default function IndexPage() {
           <Button
             className="button-primary"
             size="lg"
-            onClick={handleContinue}
+            onClick={user?.name === undefined ? handleName : handleContinue}
           >
-            CONTINUE
+            {user?.name === undefined ? 'SET' : 'CONTINUE'}
+            
           </Button>
         </form>
-        <div className="inline-block max-w-lg text-center justify-center">
-            <span className="text-3xl font-bold">
-                {`TESTE BRABO`}
-            </span>
-            <span className="text-3xl font-bold text-default">
-                {` ${user?.name}`}
-            </span>
-        </div>
+        <span className="text-3xl font-bold text-default">
+            {`${user?.name} ${user?.id}`}
+        </span>
       </section>
-        </DefaultLayout>
-    );
+    </DefaultLayout>
+  );
 }

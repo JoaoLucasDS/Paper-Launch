@@ -5,7 +5,7 @@
 body {
     @apply font-sans;
     @apply text-primary; /* Applying a global text color */
-  }
+}
 
 .page-enter {
     opacity: 0;

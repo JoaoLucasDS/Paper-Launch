@@ -9,7 +9,7 @@ export default function IndexPage() {
   const router = useRouter();
 
   const handleStart = () => {
-    router.push('/user'); // Change '/another-page' to your target route
+    router.push('/user'); 
   };
 
 

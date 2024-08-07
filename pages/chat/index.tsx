@@ -5,6 +5,11 @@ import DefaultLayout from "@/layouts/default";
 import Peer, { DataConnection } from 'peerjs';
 import Messages from '@/components/messages'; 
 
+import { useRecoilValue } from 'recoil';
+import { userAtom } from '@/state/atoms/userAtom'
+
+import { useRouter } from 'next/router';
+
 type Message = {
   from: string;
   received: boolean
@@ -19,9 +24,18 @@ export default function ChatPage() {
   const [conn, setConn] = useState<DataConnection | null>(null);
   const peerInstance = useRef<Peer | null>(null);
 
+  const router = useRouter();
+
+  const user = useRecoilValue(userAtom);
+
   useEffect(() => {
+    if (user?.name === undefined || user?.id === undefined) {
+      router.push('/user'); 
+    }
     if (!peerInstance.current) {
-      const peer = new Peer();
+      console.log('start')
+      const userId = `${user?.name} ${user?.id}`
+      const peer = new Peer(userId);
       peerInstance.current = peer;
 
       peer.on('open', (id) => {
@@ -115,7 +129,7 @@ export default function ChatPage() {
         </div>
         <div className="flex w-full justify-center items-end gap-4">
           <span className="font-bold text-1xl tracking-tighter">
-            {peerId}
+            {`${peerId} ${user?.name} ${user?.id}`}
           </span>
         </div>
         <form onSubmit={handleSubmit} className="flex w-full justify-center items-end gap-4">
