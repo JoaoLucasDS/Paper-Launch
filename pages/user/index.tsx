@@ -23,7 +23,7 @@ export default function IndexPage() {
       const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', lenght)
       return nanoid();
     }
-    setID(generateNanoId(5))
+    setID(`${generateNanoId(5)}`)
 
     return () => {
       console.log('off')
@@ -46,7 +46,11 @@ export default function IndexPage() {
   };
 
   const handleContinue = () => {
-    router.push('/chat'); 
+    if (user?.name !== inputValue) {
+      console.log('mudou nome')
+      handleName()
+    }
+    else {router.push('/chat');} 
   };
   
 
@@ -68,7 +72,7 @@ export default function IndexPage() {
                 {`${inputValue}`}
             </span>
             <span className="text-3xl font-bold text-default">
-                {` ${id}`}
+                {`${id}`}
             </span>
         </div>
         <form onSubmit={handleSubmit} className="flex w-full justify-center items-end gap-4">
@@ -83,15 +87,12 @@ export default function IndexPage() {
           <Button
             className="button-primary"
             size="lg"
-            onClick={user?.name === undefined ? handleName : handleContinue}
+            onClick={handleContinue}
           >
-            {user?.name === undefined ? 'SET' : 'CONTINUE'}
+            {user?.name !== inputValue ? 'SET' : 'CONTINUE'}
             
           </Button>
         </form>
-        <span className="text-3xl font-bold text-default">
-            {`${user?.name} ${user?.id}`}
-        </span>
       </section>
     </DefaultLayout>
   );

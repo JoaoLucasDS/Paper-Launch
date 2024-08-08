@@ -10,6 +10,8 @@ import { userAtom } from '@/state/atoms/userAtom'
 
 import { useRouter } from 'next/router';
 
+import ContentCopySharpIcon from '@mui/icons-material/ContentCopySharp';
+
 type Message = {
   from: string;
   received: boolean
@@ -28,13 +30,22 @@ export default function ChatPage() {
 
   const user = useRecoilValue(userAtom);
 
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(`${user?.name}${user?.id}`);
+      console.log('Copied!');
+    } catch (err) {
+      console.log('Failed to copy!');
+    }
+  };
+
   useEffect(() => {
     if (user?.name === undefined || user?.id === undefined) {
       router.push('/user'); 
     }
     if (!peerInstance.current) {
       console.log('start')
-      const userId = `${user?.name} ${user?.id}`
+      const userId = `${user?.name}${user?.id}`
       const peer = new Peer(userId);
       peerInstance.current = peer;
 
@@ -127,10 +138,25 @@ export default function ChatPage() {
             {`Chat ${isConnected ? 'Connected' : 'Disconnected'}`}
           </h1>
         </div>
-        <div className="flex w-full justify-center items-end gap-4">
-          <span className="font-bold text-1xl tracking-tighter">
-            {`${peerId} ${user?.name} ${user?.id}`}
-          </span>
+        <div className="flex w-full justify-center items-center gap-1 font-bold text-1xl">
+          {peerId ? (
+            <>
+            <span className="">
+              {user?.name}
+              <span className="text-default">
+                {user?.id}
+              </span>
+            </span>
+            <Button onClick={handleCopy} isIconOnly color="default" variant='light' size='sm' aria-label="Like" radius="full">
+              <ContentCopySharpIcon sx={{ fontSize: 20 }}/>
+            </Button>  
+            </>
+          ) : (
+            <>
+            </>
+          )}
+          
+         
         </div>
         <form onSubmit={handleSubmit} className="flex w-full justify-center items-end gap-4">
           <Input
