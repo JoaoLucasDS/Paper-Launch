@@ -29,6 +29,10 @@ body {
     transition: opacity 300ms, transform 300ms;
 }
 
+.snippet-primary {
+    @apply text-primary text-xl border-primary bg-secondary font-bold px-0 py-0;
+}
+
 .button-primary {
     @apply text-secondary text-3xl border-3 border-primary bg-primary font-bold px-10 py-6;
 }

@@ -1,9 +1,10 @@
 import { atom } from 'recoil';
-
 export interface User {
   id: string;
   name: string;
   email: string;
+  publicKey: string;
+  privateKey: string;
   // add more user fields as needed
 }
 

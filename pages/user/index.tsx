@@ -8,6 +8,7 @@ import { useRecoilState } from 'recoil';
 import { userAtom, User } from '@/state/atoms/userAtom'
 
 import { useRouter } from 'next/router';
+import forge from 'node-forge'
 
 export default function IndexPage() {
   const [id, setID] = useState<string>();
@@ -16,7 +17,6 @@ export default function IndexPage() {
   const [user, setUser] = useRecoilState(userAtom);
 
   const router = useRouter();
-
   useEffect(() => {
     console.log('on')
     const generateNanoId  = (lenght: number | undefined) => {
@@ -30,14 +30,32 @@ export default function IndexPage() {
     };
   }, []);
 
-  const handleName = () => {
+  const  handleName = async () => {
     if (inputValue.length > 0) {
+      const keyPair = await forge.pki.rsa.generateKeyPair(2048);
+
+      const publicKeyPem = forge.pki.publicKeyToPem(keyPair.publicKey);
+      const privateKeyPem = forge.pki.privateKeyToPem(keyPair.privateKey);
+
       try {
-        setUser((prevUser) => ({
-          ...prevUser || { name: '', id: '', email: '' },
-          name: inputValue,
-          id: id as string
-        }));
+        setUser((prevUser) => {
+          const defaultUser = {
+            name: '',
+            id: '',
+            email: '',
+            publicKey: '',
+            privateKey: ''
+          };
+    
+          return {
+            ...defaultUser,
+            ...prevUser,
+            name: inputValue,
+            id: id as string,
+            publicKey: publicKeyPem,
+            privateKey: privateKeyPem 
+          };
+        });
         
       } catch (e) {
         console.error('Connection failed:', e);

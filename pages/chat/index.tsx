@@ -1,16 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
-import { Input, Button } from "@nextui-org/react";
+import { Input, Button, Modal, Snippet } from "@nextui-org/react";
 import { title } from "@/components/primitives";
 import DefaultLayout from "@/layouts/default";
 import Peer, { DataConnection } from 'peerjs';
 import Messages from '@/components/messages'; 
+import QRCode from 'qrcode';
 
 import { useRecoilValue } from 'recoil';
 import { userAtom } from '@/state/atoms/userAtom'
 
 import { useRouter } from 'next/router';
 
+import QrCodeSharpIcon from '@mui/icons-material/QrCodeSharp';
 import ContentCopySharpIcon from '@mui/icons-material/ContentCopySharp';
+
+import * as forge from 'node-forge';
 
 type Message = {
   from: string;
@@ -26,20 +30,34 @@ export default function ChatPage() {
   const [conn, setConn] = useState<DataConnection | null>(null);
   const peerInstance = useRef<Peer | null>(null);
 
+  const [visible, setVisible] = useState(false);
+
   const router = useRouter();
 
   const user = useRecoilValue(userAtom);
 
-  const handleCopy = async () => {
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+
+  const generateQRCode  = async (value:string) => {
     try {
-      await navigator.clipboard.writeText(`${user?.name}${user?.id}`);
-      console.log('Copied!');
-    } catch (err) {
-      console.log('Failed to copy!');
+      const url = qrCodeUrl ? null : await QRCode.toDataURL(value);
+      setQrCodeUrl(url);
+    } catch (error) {
+      console.error('Failed to generate QR code:', error);
     }
   };
 
   useEffect(() => {
+    const publicKey = user?.publicKey ? forge.pki.publicKeyFromPem(user?.publicKey as string) : null;
+    const privateKey = user?.privateKey ? forge.pki.privateKeyFromPem(user?.privateKey as string) : null;
+
+    // Usando a chave pública para criptografar a mensagem
+    const mensagemCriptografada = publicKey ? publicKey.encrypt('mensagem', 'RSA-OAEP') : '';
+
+    const mensagemDescriptografada = privateKey ? privateKey.decrypt(mensagemCriptografada, 'RSA-OAEP') : '';
+
+    console.log(mensagemCriptografada)
+    console.log(mensagemDescriptografada)
     if (user?.name === undefined || user?.id === undefined) {
       router.push('/user'); 
     }
@@ -141,23 +159,18 @@ export default function ChatPage() {
         <div className="flex w-full justify-center items-center gap-1 font-bold text-1xl">
           {peerId ? (
             <>
-            <span className="">
-              {user?.name}
-              <span className="text-default">
-                {user?.id}
-              </span>
-            </span>
-            <Button onClick={handleCopy} isIconOnly color="default" variant='light' size='sm' aria-label="Like" radius="full">
-              <ContentCopySharpIcon sx={{ fontSize: 20 }}/>
-            </Button>  
+              {`${user?.name}${user?.id}`}
+              <Button className="pa-none " onClick={() => generateQRCode(`${user?.name}${user?.id}`)} isIconOnly color="primary" variant='light' size='sm' aria-label="Like" disableRipple >
+                <ContentCopySharpIcon sx={{ fontSize: 25 }}/>
+              </Button>
+              <Button className="pa-none " onClick={() => generateQRCode(`${user?.name}${user?.id}`)} isIconOnly color="primary" variant='light' size='sm' aria-label="Like" disableRipple >
+                <QrCodeSharpIcon sx={{ fontSize: 32 }}/>
+              </Button>
             </>
-          ) : (
-            <>
-            </>
-          )}
+          ) : (<></>)}
           
-         
         </div>
+        {qrCodeUrl && <img src={qrCodeUrl} alt="QR Code" />}
         <form onSubmit={handleSubmit} className="flex w-full justify-center items-end gap-4">
           <Input
             className="input-primary"

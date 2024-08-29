@@ -1,5 +1,7 @@
 import type { AppProps } from "next/app";
 
+import Head from 'next/head';
+
 import { RecoilRoot } from 'recoil';
 
 import { NextUIProvider } from "@nextui-org/system";
