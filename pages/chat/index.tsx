@@ -38,6 +38,8 @@ export default function ChatPage() {
 
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
 
+  // const [receiver, setReceiver] = useRecoilState(receiverAtom);
+
   const generateQRCode  = async (value:string) => {
     try {
       const url = qrCodeUrl ? null : await QRCode.toDataURL(value);
@@ -47,17 +49,22 @@ export default function ChatPage() {
     }
   };
 
+  const copyToClipboard  = async (text:string) => {
+    navigator.clipboard.writeText(text)
+  };
+
+
   useEffect(() => {
     const publicKey = user?.publicKey ? forge.pki.publicKeyFromPem(user?.publicKey as string) : null;
     const privateKey = user?.privateKey ? forge.pki.privateKeyFromPem(user?.privateKey as string) : null;
 
     // Usando a chave pública para criptografar a mensagem
-    const mensagemCriptografada = publicKey ? publicKey.encrypt('mensagem', 'RSA-OAEP') : '';
+    // const mensagemCriptografada = publicKey ? publicKey.encrypt('mensagem', 'RSA-OAEP') : '';
 
-    const mensagemDescriptografada = privateKey ? privateKey.decrypt(mensagemCriptografada, 'RSA-OAEP') : '';
+    // const mensagemDescriptografada = privateKey ? privateKey.decrypt(mensagemCriptografada, 'RSA-OAEP') : '';
 
-    console.log(mensagemCriptografada)
-    console.log(mensagemDescriptografada)
+    // console.log(mensagemCriptografada)
+    // console.log(mensagemDescriptografada)
     if (user?.name === undefined || user?.id === undefined) {
       router.push('/user'); 
     }
@@ -98,29 +105,47 @@ export default function ChatPage() {
   }, []);
 
   const handleConnection = () => {
-    if (!peerInstance.current || !inputValue) return;
-
+    console.log('handleConnection');
+    if (!peerInstance.current || !inputValue) {
+      console.log('No peer instance or input value');
+      return;
+    }
+  
     try {
+      console.log('Attempting to connect to:', inputValue);
       const newConn = peerInstance.current.connect(inputValue);
+  
       newConn.on('open', () => {
         console.log('Connection established with:', inputValue);
         setConn(newConn);
-        setConnected(true);
+        setConnected(true); // Conexão estabelecida com sucesso
       });
+  
       newConn.on('data', (data: unknown) => {
-        const message = data as Message; // Cast data to Message
+        const message = data as Message;
         console.log('Received data from peer:', message);
-
+  
         setMessages((prevMessages) => [...prevMessages, message]);
       });
+  
       newConn.on('error', (err) => {
         console.error('Connection error:', err);
+        setConnected(false); // Falha na conexão
       });
+  
+      newConn.on('close', () => {
+        console.log('Connection closed');
+        setConnected(false); // Conexão fechada
+      });
+  
     } catch (e) {
       console.error('Connection failed:', e);
+      setConnected(false); // Falha na conexão
     }
-    setInputValue('');
+  
+    setInputValue(''); // Limpa o campo de entrada após tentar a conexão
   };
+  
 
   const sendText = () => {
     if (conn && inputValue) {
@@ -160,7 +185,7 @@ export default function ChatPage() {
           {peerId ? (
             <>
               {`${user?.name}${user?.id}`}
-              <Button className="pa-none " onClick={() => generateQRCode(`${user?.name}${user?.id}`)} isIconOnly color="primary" variant='light' size='sm' aria-label="Like" disableRipple >
+              <Button className="pa-none " onClick={() => copyToClipboard(`${user?.name}${user?.id}`)} isIconOnly color="primary" variant='light' size='sm' aria-label="Like" disableRipple >
                 <ContentCopySharpIcon sx={{ fontSize: 25 }}/>
               </Button>
               <Button className="pa-none " onClick={() => generateQRCode(`${user?.name}${user?.id}`)} isIconOnly color="primary" variant='light' size='sm' aria-label="Like" disableRipple >

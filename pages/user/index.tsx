@@ -4,6 +4,8 @@ import { nanoid, customAlphabet  } from 'nanoid'
 import { useState, useEffect, useRef } from 'react'
 import { title } from "@/components/primitives";
 
+import PhotoUpload from "@/components/photo-upload";
+
 import { useRecoilState } from 'recoil';
 import { userAtom, User } from '@/state/atoms/userAtom'
 
@@ -111,6 +113,9 @@ export default function IndexPage() {
             
           </Button>
         </form>
+        <div>
+          <PhotoUpload/>
+        </div>
       </section>
     </DefaultLayout>
   );
